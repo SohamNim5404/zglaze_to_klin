@@ -1,0 +1,92 @@
+managed implementation in class zbp_i_kiln_hdr unique;
+strict ( 2 );
+with draft;
+
+define behavior for ZI_KILN_HDR alias KilnHeader
+persistent table ztb_kiln_hdr
+draft table ztb_kiln_hdr_d
+lock master
+total etag LocalLastChangedAt
+authorization master ( instance )
+etag master LocalLastChangedAt
+{
+  create;
+  update;
+  delete;
+
+  field ( numbering : managed, readonly ) Uuid;
+
+  field ( readonly )
+    CreatedBy,
+    CreatedAt,
+    LastChangedBy,
+    LastChangedAt,
+    LocalLastChangedAt;
+
+  association _Items { create; with draft; }
+
+  draft action Edit;
+  draft action Activate;
+  draft action Discard;
+  draft action Resume;
+  draft determine action Prepare;
+
+  mapping for ztb_kiln_hdr
+  {
+    Uuid               = uuid;
+    KilnCycle          = kiln_cycle;
+    KilnNo             = kiln_no;
+    LoadingDate        = loading_date;
+    Shift              = shift;
+    LoadedBy           = loaded_by;
+    CycleStatus        = cycle_status;
+    NumberOfItems      = number_of_items;
+    CreatedBy          = created_by;
+    CreatedAt          = created_at;
+    LastChangedBy      = last_changed_by;
+    LastChangedAt      = last_changed_at;
+    LocalLastChangedAt = local_last_changed_at;
+  }
+}
+
+
+define behavior for ZI_KILN_ITM alias KilnItem
+persistent table ztb_kiln_itm
+draft table ztb_kiln_itm_d
+lock dependent by _Header
+authorization dependent by _Header
+etag master LocalLastChangedAt
+{
+  update;
+  delete;
+
+  field ( numbering : managed, readonly ) Uuid;
+
+  field ( readonly )
+    ParentUuid,
+    CreatedBy,
+    CreatedAt,
+    LastChangedBy,
+    LastChangedAt,
+    LocalLastChangedAt;
+
+  association _Header { with draft; }
+
+  mapping for ztb_kiln_itm
+  {
+    Uuid               = uuid;
+    ParentUuid         = parent_uuid;
+    ItemNo             = item_no;
+    KilnMaterial       = kiln_material;
+    GlazedMaterial     = glazed_material;
+    GlazedBatchNo      = glazed_batch_no;
+    Sss                = sss;
+    KilnSerialNo       = kiln_serial_no;
+    Remarks            = remarks;
+    CreatedBy          = created_by;
+    CreatedAt          = created_at;
+    LastChangedBy      = last_changed_by;
+    LastChangedAt      = last_changed_at;
+    LocalLastChangedAt = local_last_changed_at;
+  }
+}
